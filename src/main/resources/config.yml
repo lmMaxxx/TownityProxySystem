@@ -1,0 +1,42 @@
+# TownityPlayerLimit – live-reloadable via /playerlimit reload
+
+# Maximum players allowed on the proxy (excluding bypass permission holders when counting joins)
+max-players: 100
+
+# If true, players with the bypass permission do not count toward the cap when joining
+# (they can still join when the server is full)
+bypass-counts-as-slot: false
+
+# Permission that allows joining when the proxy is full
+bypass-permission: townity.playerlimit.bypass
+
+# Show the configured max-players in the server list ping
+update-ping-max-players: true
+
+messages:
+  # Kick message when the proxy is full (MiniMessage or legacy &/§ from MOTD websites)
+  full: "<red>Der Server ist voll!</red> <gray>(%online%/%max%)</gray>"
+  # Feedback for /playerlimit reload
+  reload-success: "<green>TownityPlayerLimit neu geladen.</green> <gray>Max: %max%</gray>"
+  reload-failed: "<red>Reload fehlgeschlagen. Siehe Konsole.</red>"
+  no-permission: "<red>Dazu hast du keine Berechtigung.</red>"
+  usage: "<gray>Usage:</gray> <white>/playerlimit reload</white>"
+
+motd:
+  # Override the Velocity MOTD in the server list
+  enabled: false
+  # auto | minimessage | legacy
+  # auto: detects MiniMessage tags, JSON components, or &/§ codes (MOTD-Website-Export)
+  format: auto
+  # Optional: load MOTD from a file in the plugin folder (paste website export here)
+  # Leave empty to use the lines below
+  file: ""
+  # Up to two lines for the server list. Use \n in a single string for line breaks.
+  # Placeholders: %online% %max% %remaining%
+  # Examples (paste from MOTD creators):
+  #   - "&aWelcome &eto &bTownity"
+  #   - "<gradient:#00ff88:#00aaff>Townity</gradient>"
+  #   - '{"text":"Hello","color":"green"}'
+  lines:
+    - "<gradient:#57F287:#5865F2>Townity</gradient> <gray>|</gray> <white>Willkommen!</white>"
+    - "<gray>Online:</gray> <green>%online%</green><gray>/</gray><white>%max%</white>"
