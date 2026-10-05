@@ -1,14 +1,14 @@
-package de.townity.playerlimit.command;
+package de.townity.proxysystem.command;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.townity.playerlimit.TownityPlayerLimit;
-import de.townity.playerlimit.config.PluginConfig;
-import de.townity.playerlimit.maintenance.MaintenanceDialogService;
-import de.townity.playerlimit.maintenance.MaintenanceService;
-import de.townity.playerlimit.util.MessageUtil;
+import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.maintenance.MaintenanceDialogService;
+import de.townity.proxysystem.maintenance.MaintenanceService;
+import de.townity.proxysystem.util.MessageUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -19,12 +19,12 @@ public final class MaintenanceCommand implements SimpleCommand {
 
   private static final String ADMIN_PERMISSION = "townity.wartungssystem";
 
-  private final TownityPlayerLimit plugin;
+  private final TownityProxySystem plugin;
   private final MaintenanceService maintenance;
   private final MaintenanceDialogService dialogs;
 
   public MaintenanceCommand(
-      TownityPlayerLimit plugin,
+      TownityProxySystem plugin,
       MaintenanceService maintenance,
       MaintenanceDialogService dialogs
   ) {

@@ -1,4 +1,4 @@
-package de.townity.playerlimit.util;
+package de.townity.proxysystem.util;
 
 import java.util.Locale;
 import java.util.regex.Pattern;

@@ -1,4 +1,4 @@
-package de.townity.playerlimit.maintenance;
+package de.townity.proxysystem.maintenance;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -21,8 +21,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.townity.playerlimit.TownityPlayerLimit;
-import de.townity.playerlimit.util.MessageUtil;
+import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.util.MessageUtil;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -47,10 +47,10 @@ public final class MaintenanceDialogService {
   private static final int BUTTON_WIDTH = 200;
   private static final ClientVersion MIN_DIALOG_VERSION = ClientVersion.V_1_21_6;
 
-  private final TownityPlayerLimit plugin;
+  private final TownityProxySystem plugin;
   private final MaintenanceService maintenance;
 
-  public MaintenanceDialogService(TownityPlayerLimit plugin, MaintenanceService maintenance) {
+  public MaintenanceDialogService(TownityProxySystem plugin, MaintenanceService maintenance) {
     this.plugin = plugin;
     this.maintenance = maintenance;
   }

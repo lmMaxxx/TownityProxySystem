@@ -1,8 +1,8 @@
-package de.townity.playerlimit.limit;
+package de.townity.proxysystem.limit;
 
 import com.velocitypowered.api.proxy.Player;
-import de.townity.playerlimit.TownityPlayerLimit;
-import de.townity.playerlimit.config.PluginConfig;
+import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.config.PluginConfig;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -13,11 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class PlayerLimitService {
 
-  private final TownityPlayerLimit plugin;
+  private final TownityProxySystem plugin;
   private final Set<UUID> reservedSlots = ConcurrentHashMap.newKeySet();
   private final Object lock = new Object();
 
-  public PlayerLimitService(TownityPlayerLimit plugin) {
+  public PlayerLimitService(TownityProxySystem plugin) {
     this.plugin = plugin;
   }
 

@@ -1,4 +1,4 @@
-# TownityPlayerLimit – live-reloadable via /playerlimit reload
+# TownityProxySystem – live-reloadable via /playerlimit reload
 
 # Maximum players allowed on the proxy
 max-players: 100

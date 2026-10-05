@@ -1,19 +1,19 @@
-package de.townity.playerlimit.listener;
+package de.townity.proxysystem.listener;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.server.ServerPing;
-import de.townity.playerlimit.TownityPlayerLimit;
-import de.townity.playerlimit.config.PluginConfig;
-import de.townity.playerlimit.util.MessageUtil;
-import de.townity.playerlimit.util.MotdService;
+import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.util.MessageUtil;
+import de.townity.proxysystem.util.MotdService;
 import net.kyori.adventure.text.Component;
 
 public final class PingListener {
 
-  private final TownityPlayerLimit plugin;
+  private final TownityProxySystem plugin;
 
-  public PingListener(TownityPlayerLimit plugin) {
+  public PingListener(TownityProxySystem plugin) {
     this.plugin = plugin;
   }
 

@@ -1,4 +1,4 @@
-package de.townity.playerlimit;
+package de.townity.proxysystem;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.google.inject.Inject;
@@ -11,29 +11,29 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.townity.playerlimit.command.MaintenanceCommand;
-import de.townity.playerlimit.command.PlayerLimitCommand;
-import de.townity.playerlimit.config.ConfigManager;
-import de.townity.playerlimit.config.PluginConfig;
-import de.townity.playerlimit.limit.PlayerLimitService;
-import de.townity.playerlimit.listener.LoginListener;
-import de.townity.playerlimit.listener.MaintenanceDialogListener;
-import de.townity.playerlimit.listener.MaintenanceListener;
-import de.townity.playerlimit.listener.PingListener;
-import de.townity.playerlimit.maintenance.MaintenanceDialogService;
-import de.townity.playerlimit.maintenance.MaintenanceService;
+import de.townity.proxysystem.command.MaintenanceCommand;
+import de.townity.proxysystem.command.PlayerLimitCommand;
+import de.townity.proxysystem.config.ConfigManager;
+import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.limit.PlayerLimitService;
+import de.townity.proxysystem.listener.LoginListener;
+import de.townity.proxysystem.listener.MaintenanceDialogListener;
+import de.townity.proxysystem.listener.MaintenanceListener;
+import de.townity.proxysystem.listener.PingListener;
+import de.townity.proxysystem.maintenance.MaintenanceDialogService;
+import de.townity.proxysystem.maintenance.MaintenanceService;
 import io.github.retrooper.packetevents.velocity.factory.VelocityPacketEventsBuilder;
 import java.nio.file.Path;
 import org.slf4j.Logger;
 
 @Plugin(
-    id = "townityplayerlimit",
-    name = "TownityPlayerLimit",
+    id = "townityproxysystem",
+    name = "TownityProxySystem",
     version = "1.2.0",
-    description = "Player cap, live reload, MOTD and persistent network/server maintenance.",
+    description = "Proxy system: player cap, MOTD and persistent network/server maintenance.",
     authors = {"Townity"}
 )
-public final class TownityPlayerLimit {
+public final class TownityProxySystem {
 
   private final ProxyServer server;
   private final Logger logger;
@@ -45,7 +45,7 @@ public final class TownityPlayerLimit {
   private PlayerLimitService playerLimitService;
 
   @Inject
-  public TownityPlayerLimit(
+  public TownityProxySystem(
       ProxyServer server,
       Logger logger,
       @DataDirectory Path dataDirectory,
@@ -94,7 +94,7 @@ public final class TownityPlayerLimit {
     PluginConfig config = configManager.config();
     PluginConfig.MaintenanceState state = configManager.maintenanceState();
     logger.info(
-        "TownityPlayerLimit enabled – max players: {}, network maintenance: {}, servers: {}",
+        "TownityProxySystem enabled – max players: {}, network maintenance: {}, servers: {}",
         config.maxPlayers(),
         state.networkEnabled(),
         state.servers().isEmpty() ? "-" : state.servers()

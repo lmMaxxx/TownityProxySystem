@@ -1,4 +1,4 @@
-package de.townity.playerlimit.listener;
+package de.townity.proxysystem.listener;
 
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
@@ -9,23 +9,23 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCustomClickAction;
 import com.velocitypowered.api.proxy.Player;
-import de.townity.playerlimit.TownityPlayerLimit;
-import de.townity.playerlimit.config.PluginConfig;
-import de.townity.playerlimit.maintenance.MaintenanceDialogService;
-import de.townity.playerlimit.maintenance.MaintenanceService;
-import de.townity.playerlimit.util.MessageUtil;
+import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.maintenance.MaintenanceDialogService;
+import de.townity.proxysystem.maintenance.MaintenanceService;
+import de.townity.proxysystem.util.MessageUtil;
 import java.util.UUID;
 
 public final class MaintenanceDialogListener extends PacketListenerAbstract {
 
   private static final String ADMIN_PERMISSION = "townity.wartungssystem";
 
-  private final TownityPlayerLimit plugin;
+  private final TownityProxySystem plugin;
   private final MaintenanceService maintenance;
   private final MaintenanceDialogService dialogs;
 
   public MaintenanceDialogListener(
-      TownityPlayerLimit plugin,
+      TownityProxySystem plugin,
       MaintenanceService maintenance,
       MaintenanceDialogService dialogs
   ) {

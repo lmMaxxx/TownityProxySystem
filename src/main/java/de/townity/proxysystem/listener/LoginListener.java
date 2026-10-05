@@ -1,4 +1,4 @@
-package de.townity.playerlimit.listener;
+package de.townity.proxysystem.listener;
 
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
@@ -6,18 +6,18 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.Player;
-import de.townity.playerlimit.TownityPlayerLimit;
-import de.townity.playerlimit.config.PluginConfig;
-import de.townity.playerlimit.limit.PlayerLimitService;
-import de.townity.playerlimit.util.MessageUtil;
+import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.limit.PlayerLimitService;
+import de.townity.proxysystem.util.MessageUtil;
 import net.kyori.adventure.text.Component;
 
 public final class LoginListener {
 
-  private final TownityPlayerLimit plugin;
+  private final TownityProxySystem plugin;
   private final PlayerLimitService limit;
 
-  public LoginListener(TownityPlayerLimit plugin, PlayerLimitService limit) {
+  public LoginListener(TownityProxySystem plugin, PlayerLimitService limit) {
     this.plugin = plugin;
     this.limit = limit;
   }

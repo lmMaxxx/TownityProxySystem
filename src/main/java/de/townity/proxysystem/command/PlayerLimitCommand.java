@@ -1,9 +1,9 @@
-package de.townity.playerlimit.command;
+package de.townity.proxysystem.command;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
-import de.townity.playerlimit.TownityPlayerLimit;
-import de.townity.playerlimit.util.MessageUtil;
+import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.util.MessageUtil;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
@@ -12,9 +12,9 @@ public final class PlayerLimitCommand implements SimpleCommand {
 
   private static final String RELOAD_PERMISSION = "townity.playerlimit.reload";
 
-  private final TownityPlayerLimit plugin;
+  private final TownityProxySystem plugin;
 
-  public PlayerLimitCommand(TownityPlayerLimit plugin) {
+  public PlayerLimitCommand(TownityProxySystem plugin) {
     this.plugin = plugin;
   }
 

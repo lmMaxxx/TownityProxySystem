@@ -46,6 +46,6 @@ Details: `paper/README.md`
 | Ganzer Proxy stoppt | Velocity `lang/` → Shutdown |
 | Citybuild `/restart` | Paper `spigot.yml` → restart |
 | Citybuild crasht / disconnect, Failover | Velocity `lang/` → Verbindungsfehler / getrennt |
-| Wartung / Player-Cap | TownityPlayerLimit-Plugin (eigene Config) |
+| Wartung / Player-Cap | TownityProxySystem-Plugin (eigene Config) |
 
 Alles nutzt dasselbe Design: **TOWNITY.DE** gold+fett, Body grau, Wichtiges gold.

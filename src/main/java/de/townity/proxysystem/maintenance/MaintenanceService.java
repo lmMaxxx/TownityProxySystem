@@ -1,10 +1,10 @@
-package de.townity.playerlimit.maintenance;
+package de.townity.proxysystem.maintenance;
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.townity.playerlimit.TownityPlayerLimit;
-import de.townity.playerlimit.config.PluginConfig;
-import de.townity.playerlimit.util.MessageUtil;
+import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.util.MessageUtil;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -12,9 +12,9 @@ import net.kyori.adventure.text.Component;
 
 public final class MaintenanceService {
 
-  private final TownityPlayerLimit plugin;
+  private final TownityProxySystem plugin;
 
-  public MaintenanceService(TownityPlayerLimit plugin) {
+  public MaintenanceService(TownityProxySystem plugin) {
     this.plugin = plugin;
   }
 

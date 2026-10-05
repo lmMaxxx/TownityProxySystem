@@ -1,4 +1,4 @@
-# TownityPlayerLimit
+# TownityProxySystem
 
 Velocity-Plugin (4.1.0-SNAPSHOT) für Player-Cap, MOTD und persistente Wartung.
 
@@ -26,7 +26,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 25)
 mvn -B package
 ```
 
-JAR: `target/TownityPlayerLimit-1.2.0.jar`
+JAR: `target/TownityProxySystem-1.2.0.jar`
 
 ## Commands
 
@@ -54,7 +54,7 @@ Alias: `/maintenance`
 ## Wartung
 
 Beim Aktivieren:
-1. Zustand wird nach `plugins/townityplayerlimit/maintenance-state.yml` geschrieben
+1. Zustand wird nach `plugins/townityproxysystem/maintenance-state.yml` geschrieben
 2. Alle Spieler ohne Bypass werden gekickt (Netzwerk bzw. betroffener Server)
 3. Neue Joins / Server-Wechsel ohne Bypass werden blockiert
 4. Optional: Maintenance-MOTD in der Serverliste

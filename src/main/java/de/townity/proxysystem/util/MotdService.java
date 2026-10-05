@@ -1,7 +1,7 @@
-package de.townity.playerlimit.util;
+package de.townity.proxysystem.util;
 
-import de.townity.playerlimit.TownityPlayerLimit;
-import de.townity.playerlimit.config.PluginConfig;
+import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.config.PluginConfig;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,7 +14,7 @@ public final class MotdService {
 
   private MotdService() {}
 
-  public static Component buildMotd(TownityPlayerLimit plugin) {
+  public static Component buildMotd(TownityProxySystem plugin) {
     PluginConfig config = plugin.config();
     PluginConfig.Motd motd = config.motd();
     MessageUtil.Placeholders placeholders =
@@ -24,7 +24,7 @@ public final class MotdService {
     return MessageUtil.joinLines(lines, motd.format(), placeholders);
   }
 
-  private static List<String> resolveLines(TownityPlayerLimit plugin, PluginConfig.Motd motd) {
+  private static List<String> resolveLines(TownityProxySystem plugin, PluginConfig.Motd motd) {
     String fileName = motd.file();
     if (fileName != null && !fileName.isBlank()) {
       Path path = plugin.dataDirectory().resolve(fileName);

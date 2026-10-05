@@ -1,4 +1,4 @@
-package de.townity.playerlimit.config;
+package de.townity.proxysystem.config;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +15,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import de.townity.playerlimit.util.MessageUtil;
+import de.townity.proxysystem.util.MessageUtil;
 
 public final class ConfigManager {
 
@@ -136,7 +136,7 @@ public final class ConfigManager {
       options.setPrettyFlow(true);
       String dump = new Yaml(options).dump(root);
       String header = """
-          # Persisted by TownityPlayerLimit – survives proxy restarts.
+          # Persisted by TownityProxySystem – survives proxy restarts.
           # Prefer /wartung commands over editing this file while the proxy is running.
           """;
       Files.writeString(maintenanceStatePath, header + dump, StandardCharsets.UTF_8);

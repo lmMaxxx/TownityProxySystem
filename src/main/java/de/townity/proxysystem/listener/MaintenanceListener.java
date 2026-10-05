@@ -1,4 +1,4 @@
-package de.townity.playerlimit.listener;
+package de.townity.proxysystem.listener;
 
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.ResultedEvent;
@@ -7,15 +7,15 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.townity.playerlimit.TownityPlayerLimit;
-import de.townity.playerlimit.maintenance.MaintenanceService;
+import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.maintenance.MaintenanceService;
 
 public final class MaintenanceListener {
 
-  private final TownityPlayerLimit plugin;
+  private final TownityProxySystem plugin;
   private final MaintenanceService maintenance;
 
-  public MaintenanceListener(TownityPlayerLimit plugin, MaintenanceService maintenance) {
+  public MaintenanceListener(TownityProxySystem plugin, MaintenanceService maintenance) {
     this.plugin = plugin;
     this.maintenance = maintenance;
   }

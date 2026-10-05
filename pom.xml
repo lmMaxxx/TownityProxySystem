@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.townity</groupId>
-    <artifactId>TownityPlayerLimit</artifactId>
+    <artifactId>TownityProxySystem</artifactId>
     <version>1.2.0</version>
     <packaging>jar</packaging>
 
-    <name>TownityPlayerLimit</name>
-    <description>Caps the maximum player count on Velocity with live reload, bypass permission and MOTD support.</description>
+    <name>TownityProxySystem</name>
+    <description>Velocity proxy system: player cap, MOTD, maintenance and live reload.</description>
 
     <properties>
         <java.version>25</java.version>
@@ -59,7 +59,7 @@
     </dependencies>
 
     <build>
-        <finalName>TownityPlayerLimit-${project.version}</finalName>
+        <finalName>TownityProxySystem-${project.version}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -103,15 +103,15 @@
                             <relocations>
                                 <relocation>
                                     <pattern>org.yaml.snakeyaml</pattern>
-                                    <shadedPattern>de.townity.playerlimit.lib.snakeyaml</shadedPattern>
+                                    <shadedPattern>de.townity.proxysystem.lib.snakeyaml</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.github.retrooper</pattern>
-                                    <shadedPattern>de.townity.playerlimit.lib.packetevents.api</shadedPattern>
+                                    <shadedPattern>de.townity.proxysystem.lib.packetevents.api</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>io.github.retrooper</pattern>
-                                    <shadedPattern>de.townity.playerlimit.lib.packetevents.impl</shadedPattern>
+                                    <shadedPattern>de.townity.proxysystem.lib.packetevents.impl</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>
