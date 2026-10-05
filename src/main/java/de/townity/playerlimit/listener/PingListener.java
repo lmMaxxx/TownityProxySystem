@@ -5,7 +5,9 @@ import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import de.townity.playerlimit.TownityPlayerLimit;
 import de.townity.playerlimit.config.PluginConfig;
+import de.townity.playerlimit.util.MessageUtil;
 import de.townity.playerlimit.util.MotdService;
+import net.kyori.adventure.text.Component;
 
 public final class PingListener {
 
@@ -26,13 +28,32 @@ public final class PingListener {
       changed = true;
     }
 
-    if (config.motd().enabled()) {
-      builder.description(MotdService.buildMotd(plugin));
+    Component motd = resolveMotd(config);
+    if (motd != null) {
+      builder.description(motd);
       changed = true;
     }
 
     if (changed) {
       event.setPing(builder.build());
     }
+  }
+
+  private Component resolveMotd(PluginConfig config) {
+    if (plugin.maintenance() != null
+        && plugin.maintenance().isNetworkEnabled()
+        && config.maintenance().overrideMotd()) {
+      MessageUtil.Placeholders placeholders =
+          new MessageUtil.Placeholders(plugin.onlinePlayers(), config.maxPlayers());
+      return MessageUtil.joinLines(
+          config.maintenance().motdLines(),
+          config.maintenance().format(),
+          placeholders
+      );
+    }
+    if (config.motd().enabled()) {
+      return MotdService.buildMotd(plugin);
+    }
+    return null;
   }
 }

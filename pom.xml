@@ -6,7 +6,7 @@
 
     <groupId>de.townity</groupId>
     <artifactId>TownityPlayerLimit</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
 
     <name>TownityPlayerLimit</name>
@@ -23,6 +23,10 @@
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>codemc-releases</id>
+            <url>https://repo.codemc.io/repository/maven-releases/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -36,6 +40,21 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.retrooper</groupId>
+            <artifactId>packetevents-velocity</artifactId>
+            <version>2.13.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.kyori</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -75,10 +94,24 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>io.netty:*</exclude>
+                                    <exclude>net.kyori:*</exclude>
+                                </excludes>
+                            </artifactSet>
                             <relocations>
                                 <relocation>
                                     <pattern>org.yaml.snakeyaml</pattern>
                                     <shadedPattern>de.townity.playerlimit.lib.snakeyaml</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.github.retrooper</pattern>
+                                    <shadedPattern>de.townity.playerlimit.lib.packetevents.api</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>io.github.retrooper</pattern>
+                                    <shadedPattern>de.townity.playerlimit.lib.packetevents.impl</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>

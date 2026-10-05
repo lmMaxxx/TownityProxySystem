@@ -1,15 +1,23 @@
 # TownityPlayerLimit
 
-Velocity-Plugin (4.1.0-SNAPSHOT), das die maximale Spieleranzahl auf dem Proxy capped.
+Velocity-Plugin (4.1.0-SNAPSHOT) für Player-Cap, MOTD und persistente Wartung.
+
+**Design / Brand für Messages & MOTD:** siehe [`DESIGN.md`](DESIGN.md)
 
 ## Features
 
 - Einstellbares Player-Cap (`max-players`)
-- Live-Reload per `/playerlimit reload` (Aliases: `/plimit`, `/playercap`)
-- Bypass-Permission für Joins bei vollem Server
-- Konfigurierbare Kick-/Feedback-Nachrichten (MiniMessage oder Legacy)
-- Optionale MOTD-Überschreibung inkl. Export von MOTD-Websites (`&`/`§`, MiniMessage, JSON)
-- Zeigt das Cap in der Serverliste (`update-ping-max-players`)
+- Live-Reload: `/playerlimit reload`
+- Bypass bei vollem Server: `townity.playerlimit.bypass`
+- Wartung: `townity.wartungssystem` / `townity.wartungssystem.bypass`
+- Nachrichten & MOTD mit **MiniMessage**, **`&`**, **`§`** und Hex (`&#RRGGBB`, `&x&r&r&g&g&b&b`)
+- MOTD-Import von Website-Exports
+- **Wartung (neustart-persistent)**
+  - Dialog: `/wartung` (Minecraft 1.21.6+, Paper-Dialogs auf dem Proxy)
+  - ganzes Netzwerk: `/wartung an|aus`
+  - einzelne Backend-Server: `/wartung server <name> an|aus`
+  - ohne Bypass: Join blockiert / Kick beim Aktivieren
+  - Status in `maintenance-state.yml` (überlebt Proxy-Restarts)
 
 ## Build
 
@@ -18,38 +26,37 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 25)
 mvn -B package
 ```
 
-Fertiges JAR: `target/TownityPlayerLimit-1.0.0.jar`
+JAR: `target/TownityPlayerLimit-1.2.0.jar`
 
-## Installation
+## Commands
 
-1. JAR nach `plugins/` legen
-2. Velocity starten
-3. `plugins/townityplayerlimit/config.yml` anpassen
-4. `/playerlimit reload` ausführen
+| Command | Beschreibung |
+|---|---|
+| `/wartung` | Öffnet den Wartungs-Dialog (Spieler, 1.21.6+) |
+| `/playerlimit reload` | Config neu laden |
+| `/wartung an` | Netzwerk-Wartung an (kickt ohne Bypass) |
+| `/wartung aus` | Netzwerk-Wartung aus |
+| `/wartung server lobby an` | Nur Server `lobby` in Wartung |
+| `/wartung server lobby aus` | Server-Wartung aus |
+| `/wartung status` | Aktueller Status |
+
+Alias: `/maintenance`
 
 ## Permissions
 
 | Permission | Beschreibung |
 |---|---|
-| `townity.playerlimit.bypass` | Join trotz vollem Server |
-| `townity.playerlimit.reload` | Config neu laden |
+| `townity.playerlimit.bypass` | Join trotz Player-Cap |
+| `townity.playerlimit.reload` | Config reload |
+| `townity.wartungssystem.bypass` | Wartung umgehen |
+| `townity.wartungssystem` | Wartung steuern (Command + Dialog) |
 
-## MOTD aus Websites
+## Wartung
 
-1. MOTD auf einer Creator-Seite bauen (z. B. Minecraft Tools / MCTools)
-2. Export mit `&`- oder `§`-Codes, MiniMessage oder JSON kopieren
-3. Entweder in `motd.lines` einfügen oder in eine Datei legen:
+Beim Aktivieren:
+1. Zustand wird nach `plugins/townityplayerlimit/maintenance-state.yml` geschrieben
+2. Alle Spieler ohne Bypass werden gekickt (Netzwerk bzw. betroffener Server)
+3. Neue Joins / Server-Wechsel ohne Bypass werden blockiert
+4. Optional: Maintenance-MOTD in der Serverliste
 
-```yaml
-motd:
-  enabled: true
-  format: auto
-  file: motd.txt
-  lines: []
-```
-
-`motd.txt` im Plugin-Ordner – eine Zeile = eine MOTD-Zeile. Platzhalter: `%online%`, `%max%`, `%remaining%`.
-
-## Commands
-
-- `/playerlimit reload` – lädt `config.yml` und MOTD-Datei neu
+Nach einem Proxy-Neustart bleibt der Wartungsstatus erhalten.

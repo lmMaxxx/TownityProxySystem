@@ -1,10 +1,9 @@
 # TownityPlayerLimit – live-reloadable via /playerlimit reload
 
-# Maximum players allowed on the proxy (excluding bypass permission holders when counting joins)
+# Maximum players allowed on the proxy
 max-players: 100
 
-# If true, players with the bypass permission do not count toward the cap when joining
-# (they can still join when the server is full)
+# If false, bypass players do not consume a slot toward the cap
 bypass-counts-as-slot: false
 
 # Permission that allows joining when the proxy is full
@@ -13,30 +12,47 @@ bypass-permission: townity.playerlimit.bypass
 # Show the configured max-players in the server list ping
 update-ping-max-players: true
 
+# Chat-Prefix (mit Pfeil) | Disconnect-Titel (ohne Pfeil, eigene Zeile)
+prefix: "&6&lTOWNITY.DE &7⇒ "
+disconnect-prefix: "&6&lTOWNITY.DE"
+
 messages:
-  # Kick message when the proxy is full (MiniMessage or legacy &/§ from MOTD websites)
-  full: "<red>Der Server ist voll!</red> <gray>(%online%/%max%)</gray>"
-  # Feedback for /playerlimit reload
-  reload-success: "<green>TownityPlayerLimit neu geladen.</green> <gray>Max: %max%</gray>"
-  reload-failed: "<red>Reload fehlgeschlagen. Siehe Konsole.</red>"
-  no-permission: "<red>Dazu hast du keine Berechtigung.</red>"
-  usage: "<gray>Usage:</gray> <white>/playerlimit reload</white>"
+  # Wichtige Wörter: &6 | Rest: &7 | Prefix wird automatisch vorangestellt
+  full: "&7Der Server ist aktuell &6voll&7! &7(&6%online%&7/&6%max%&7)"
+  reload-success: "&7Die Config wurde &6erfolgreich &7neu geladen&7. &7Max: &6%max%"
+  reload-failed: "&7Der Reload ist &6fehlgeschlagen&7. Siehe Konsole."
+  no-permission: "&7Dazu hast du &6keine Berechtigung&7."
+  usage: "&7Verwendung: &6/playerlimit reload &7| &6/wartung"
 
 motd:
-  # Override the Velocity MOTD in the server list
-  enabled: false
+  enabled: true
   # auto | minimessage | legacy
-  # auto: detects MiniMessage tags, JSON components, or &/§ codes (MOTD-Website-Export)
   format: auto
-  # Optional: load MOTD from a file in the plugin folder (paste website export here)
-  # Leave empty to use the lines below
   file: ""
-  # Up to two lines for the server list. Use \n in a single string for line breaks.
-  # Placeholders: %online% %max% %remaining%
-  # Examples (paste from MOTD creators):
-  #   - "&aWelcome &eto &bTownity"
-  #   - "<gradient:#00ff88:#00aaff>Townity</gradient>"
-  #   - '{"text":"Hello","color":"green"}'
   lines:
-    - "<gradient:#57F287:#5865F2>Townity</gradient> <gray>|</gray> <white>Willkommen!</white>"
-    - "<gray>Online:</gray> <green>%online%</green><gray>/</gray><white>%max%</white>"
+    - "&6■■■■■■■■■■■■ &e✦ &6TOWNITY.DE &e✦ &6■■■■■■■■■■■■"
+    - "&6       ⚙ &6ᴄɪᴛʏʙᴜɪʟᴅ &e• &6ᴇᴠᴇɴᴛꜱ &e• &6ᴄᴏᴍᴍᴜɴɪᴛʏ ⚙"
+
+# Wartung – Status in maintenance-state.yml (überlebt Restarts)
+maintenance:
+  bypass-permission: townity.wartungssystem.bypass
+  kick-on-enable: true
+  block-join: true
+  motd:
+    enabled: true
+    format: auto
+    lines:
+      - "&6■■■■■■■■■■■■ &e✦ &6TOWNITY.DE &e✦ &6■■■■■■■■■■■■"
+      - "&6          ⚙ &6ᴡᴀʀᴛᴜɴɢ &e• &6ʙᴀʟᴅ &e• &6ᴢᴜʀüᴄᴋ ⚙"
+  messages:
+    network-kick: "&7Das Netzwerk ist derzeit in &6Wartung&7."
+    server-kick: "&7Der Server &6%server% &7ist in &6Wartung&7."
+    network-denied: "&7Das Netzwerk ist derzeit in &6Wartung&7."
+    server-denied: "&7Du kannst &6%server% &7gerade nicht betreten (&6Wartung&7)."
+    enabled: "&7Netzwerk-Wartung wurde &6aktiviert&7."
+    disabled: "&7Netzwerk-Wartung wurde &6deaktiviert&7."
+    server-enabled: "&7Wartung für &6%server% &7wurde &6aktiviert&7."
+    server-disabled: "&7Wartung für &6%server% &7wurde &6deaktiviert&7."
+    status: "&7Netzwerk: &6%network% &7| Server: &6%servers%"
+    unknown-server: "&7Unbekannter Server: &6%server%"
+    usage: "&7Verwendung: &6/wartung &7| &6an&7/&6aus &7| &6server <name> <an|aus> &7| &6status"

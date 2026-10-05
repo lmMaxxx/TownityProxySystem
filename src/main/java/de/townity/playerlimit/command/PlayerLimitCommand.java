@@ -62,7 +62,7 @@ public final class PlayerLimitCommand implements SimpleCommand {
     return true;
   }
 
-  private static Component parse(String message) {
-    return MessageUtil.parse(message, "auto");
+  private Component parse(String message) {
+    return MessageUtil.parsePrefixed(plugin.config().prefix(), message, "auto");
   }
 }

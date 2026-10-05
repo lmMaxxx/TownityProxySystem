@@ -1,0 +1,18 @@
+# Optional – serverbezogene Restart-Texte (nur Body, ohne TOWNITY.DE-Titel)
+#
+# Velocity setzt den Disconnect-Titel. Hier nur den Fließtext anpassen.
+
+# Lobby
+restart: "&7Die &6Lobby &7startet gerade &6neu&7."
+
+# Citybuild
+# restart: "&7Der &6Citybuild &7startet gerade &6neu&7."
+
+# Bauserver
+# restart: "&7Der &6Bauserver &7startet gerade &6neu&7."
+
+# Eventserver
+# restart: "&7Der &6Eventserver &7startet gerade &6neu&7."
+
+# Testserver
+# restart: "&7Der &6Testserver &7startet gerade &6neu&7."

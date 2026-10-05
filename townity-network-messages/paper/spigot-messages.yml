@@ -1,0 +1,16 @@
+# Townity – Paper (Unterserver) Nachrichten
+#
+# WICHTIG hinter Velocity:
+# Disconnect/Kick = NUR Body (&7/&6), KEIN TOWNITY.DE-Titel.
+# Velocity setzt den Titel (sonst doppelt: Prefix+Nachricht zweimal).
+#
+# Chat (unknown-command) behält das Prefix mit ⇒.
+# Nach Änderung: Paper-Server neu starten.
+
+messages:
+  whitelist: "&7Du stehst nicht auf der &6Whitelist&7."
+  unknown-command: "&6&lTOWNITY.DE &7⇒ &7Unbekannter Befehl. Nutze &6/help&7."
+  server-full: "&7Der Server ist aktuell &6voll&7."
+  outdated-client: "&7Dein Client ist &6veraltet&7. Bitte nutze &6{0}&7."
+  outdated-server: "&7Dein Client ist &6zu neu&7. Server läuft auf &6{0}&7."
+  restart: "&7Der Server startet gerade &6neu&7."
