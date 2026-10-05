@@ -7,22 +7,20 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.config.TownityMessages;
 import de.townity.proxysystem.maintenance.MaintenanceService;
 
 public final class MaintenanceListener {
 
-  private final TownityProxySystem plugin;
   private final MaintenanceService maintenance;
 
-  public MaintenanceListener(TownityProxySystem plugin, MaintenanceService maintenance) {
-    this.plugin = plugin;
+  public MaintenanceListener(de.townity.proxysystem.TownityProxySystem plugin, MaintenanceService maintenance) {
     this.maintenance = maintenance;
   }
 
   @Subscribe(order = PostOrder.EARLY)
   public void onLogin(LoginEvent event) {
-    if (!plugin.config().maintenance().blockJoin()) {
+    if (!TownityMessages.MAINTENANCE_BLOCK_JOIN) {
       return;
     }
     if (!maintenance.isNetworkEnabled()) {
@@ -37,7 +35,7 @@ public final class MaintenanceListener {
 
   @Subscribe(order = PostOrder.EARLY)
   public void onServerPreConnect(ServerPreConnectEvent event) {
-    if (!plugin.config().maintenance().blockJoin()) {
+    if (!TownityMessages.MAINTENANCE_BLOCK_JOIN) {
       return;
     }
 
@@ -61,7 +59,6 @@ public final class MaintenanceListener {
 
   private void denyConnect(ServerPreConnectEvent event, Player player, net.kyori.adventure.text.Component reason) {
     event.setResult(ServerPreConnectEvent.ServerResult.denied());
-    // Always disconnect so the client shows the 2-line fullscreen reason
     player.disconnect(reason);
   }
 }

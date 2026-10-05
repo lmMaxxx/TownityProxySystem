@@ -8,6 +8,7 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.Player;
 import de.townity.proxysystem.TownityProxySystem;
 import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.config.TownityMessages;
 import de.townity.proxysystem.limit.PlayerLimitService;
 import de.townity.proxysystem.util.MessageUtil;
 import net.kyori.adventure.text.Component;
@@ -71,9 +72,9 @@ public final class LoginListener {
         config.maxPlayers()
     );
     return MessageUtil.parseDisconnect(
-        config.disconnectPrefix(),
-        placeholders.apply(config.messages().full()),
-        "auto"
+        TownityMessages.DISCONNECT_PREFIX,
+        placeholders.apply(TownityMessages.FULL),
+        TownityMessages.FORMAT
     );
   }
 }

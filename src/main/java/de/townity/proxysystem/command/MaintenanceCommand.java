@@ -5,15 +5,15 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.townity.proxysystem.TownityProxySystem;
-import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.config.TownityMessages;
 import de.townity.proxysystem.maintenance.MaintenanceDialogService;
 import de.townity.proxysystem.maintenance.MaintenanceService;
-import de.townity.proxysystem.util.MessageUtil;
+import de.townity.proxysystem.util.Messages;
+import de.townity.proxysystem.util.TownitySounds;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
-import net.kyori.adventure.text.Component;
 
 public final class MaintenanceCommand implements SimpleCommand {
 
@@ -37,18 +37,18 @@ public final class MaintenanceCommand implements SimpleCommand {
   public void execute(Invocation invocation) {
     CommandSource source = invocation.source();
     String[] args = invocation.arguments();
-    PluginConfig.MaintenanceMessages messages = plugin.config().maintenance().messages();
 
     if (!source.hasPermission(ADMIN_PERMISSION)) {
-      source.sendMessage(parse(plugin.config().messages().noPermission()));
+      Messages.sendError(source, TownityMessages.NO_PERMISSION);
       return;
     }
 
     if (args.length == 0 || args[0].equalsIgnoreCase("gui") || args[0].equalsIgnoreCase("menu")) {
       if (source instanceof Player player) {
+        TownitySounds.menu(player);
         dialogs.open(player);
       } else {
-        source.sendMessage(parse(messages.usage()));
+        Messages.send(source, TownityMessages.MAINTENANCE_USAGE);
       }
       return;
     }
@@ -57,23 +57,23 @@ public final class MaintenanceCommand implements SimpleCommand {
     switch (sub) {
       case "an", "ein", "on", "enable" -> {
         maintenance.setNetworkEnabled(true);
-        source.sendMessage(parse(messages.enabled()));
+        Messages.sendSuccess(source, TownityMessages.MAINTENANCE_ENABLED);
         plugin.logger().info("Network maintenance enabled by {}", source);
       }
       case "aus", "off", "disable" -> {
         maintenance.setNetworkEnabled(false);
-        source.sendMessage(parse(messages.disabled()));
+        Messages.sendSuccess(source, TownityMessages.MAINTENANCE_DISABLED);
         plugin.logger().info("Network maintenance disabled by {}", source);
       }
       case "status" -> source.sendMessage(maintenance.statusMessage());
-      case "server" -> handleServer(source, args, messages);
-      default -> source.sendMessage(parse(messages.usage()));
+      case "server" -> handleServer(source, args);
+      default -> Messages.send(source, TownityMessages.MAINTENANCE_USAGE);
     }
   }
 
-  private void handleServer(CommandSource source, String[] args, PluginConfig.MaintenanceMessages messages) {
+  private void handleServer(CommandSource source, String[] args) {
     if (args.length < 3) {
-      source.sendMessage(parse(messages.usage()));
+      Messages.send(source, TownityMessages.MAINTENANCE_USAGE);
       return;
     }
     String serverName = args[1];
@@ -81,19 +81,21 @@ public final class MaintenanceCommand implements SimpleCommand {
     boolean enable = toggle.equals("an") || toggle.equals("ein") || toggle.equals("on") || toggle.equals("enable");
     boolean disable = toggle.equals("aus") || toggle.equals("off") || toggle.equals("disable");
     if (!enable && !disable) {
-      source.sendMessage(parse(messages.usage()));
+      Messages.send(source, TownityMessages.MAINTENANCE_USAGE);
       return;
     }
 
     if (!maintenance.setServerEnabled(serverName, enable)) {
-      source.sendMessage(parse(messages.unknownServer().replace("%server%", serverName)));
+      Messages.sendError(source, TownityMessages.MAINTENANCE_UNKNOWN_SERVER.replace("%server%", serverName));
       return;
     }
 
     RegisteredServer server = maintenance.findServer(serverName).orElseThrow();
     String name = server.getServerInfo().getName();
-    String template = enable ? messages.serverEnabled() : messages.serverDisabled();
-    source.sendMessage(parse(template.replace("%server%", name)));
+    String template = enable
+        ? TownityMessages.MAINTENANCE_SERVER_ENABLED
+        : TownityMessages.MAINTENANCE_SERVER_DISABLED;
+    Messages.sendSuccess(source, template.replace("%server%", name));
     plugin.logger().info("Server maintenance {} for {} by {}", enable ? "enabled" : "disabled", name, source);
   }
 
@@ -133,13 +135,5 @@ public final class MaintenanceCommand implements SimpleCommand {
       }
     }
     return result;
-  }
-
-  private Component parse(String message) {
-    return MessageUtil.parsePrefixed(
-        plugin.config().prefix(),
-        message,
-        plugin.config().maintenance().format()
-    );
   }
 }

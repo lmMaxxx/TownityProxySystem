@@ -6,16 +6,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import de.townity.proxysystem.util.MessageUtil;
 
 public final class ConfigManager {
 
@@ -31,7 +28,7 @@ public final class ConfigManager {
     this.configPath = dataDirectory.resolve("config.yml");
     this.maintenanceStatePath = dataDirectory.resolve("maintenance-state.yml");
     this.logger = logger;
-    this.config = defaults();
+    this.config = new PluginConfig(100);
     this.maintenanceState = new PluginConfig.MaintenanceState(false, Set.of());
   }
 
@@ -58,7 +55,7 @@ public final class ConfigManager {
       maintenanceState = loadMaintenanceState();
     } catch (IOException e) {
       logger.error("Failed to load config.yml, using defaults", e);
-      config = defaults();
+      config = new PluginConfig(100);
       maintenanceState = new PluginConfig.MaintenanceState(false, Set.of());
     }
   }
@@ -74,6 +71,36 @@ public final class ConfigManager {
       return true;
     } catch (Exception e) {
       logger.error("Failed to reload config.yml", e);
+      return false;
+    }
+  }
+
+  /**
+   * Updates {@code max-players} in memory and persists it to {@code config.yml}.
+   */
+  public synchronized boolean setMaxPlayers(int maxPlayers) {
+    int sanitized = Math.max(0, maxPlayers);
+    config = new PluginConfig(sanitized);
+    return persistMaxPlayers(sanitized);
+  }
+
+  private boolean persistMaxPlayers(int sanitized) {
+    try {
+      Files.createDirectories(dataDirectory);
+      if (!Files.exists(configPath)) {
+        load();
+        config = new PluginConfig(sanitized);
+      }
+      String raw = Files.readString(configPath);
+      if (raw.lines().anyMatch(line -> line.matches("^max-players:\\s*.*"))) {
+        raw = raw.replaceFirst("(?m)^max-players:\\s*.*$", "max-players: " + sanitized);
+      } else {
+        raw = "max-players: " + sanitized + "\n" + raw;
+      }
+      Files.writeString(configPath, raw, StandardCharsets.UTF_8);
+      return true;
+    } catch (IOException e) {
+      logger.error("Failed to save max-players to config.yml", e);
       return false;
     }
   }
@@ -145,167 +172,25 @@ public final class ConfigManager {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private PluginConfig parse(String raw) {
     Map<String, Object> root = new Yaml().load(raw);
     if (root == null) {
-      return defaults();
+      return new PluginConfig(100);
     }
-
-    int maxPlayers = Math.max(0, asInt(root.get("max-players"), 100));
-    boolean bypassCountsAsSlot = asBoolean(root.get("bypass-counts-as-slot"), false);
-    String bypassPermission = asString(root.get("bypass-permission"), "townity.playerlimit.bypass");
-    boolean updatePingMaxPlayers = asBoolean(root.get("update-ping-max-players"), true);
-    String prefix = asString(root.get("prefix"), MessageUtil.DEFAULT_PREFIX);
-    String disconnectPrefix = asString(root.get("disconnect-prefix"), MessageUtil.DEFAULT_DISCONNECT_PREFIX);
-
-    Map<String, Object> messagesMap = asMap(root.get("messages"));
-    PluginConfig.Messages messages = new PluginConfig.Messages(
-        asString(messagesMap.get("full"), "&7Der Server ist aktuell &6voll&7! &7(&6%online%&7/&6%max%&7)"),
-        asString(messagesMap.get("reload-success"), "&7Die Config wurde &6erfolgreich &7neu geladen&7. &7Max: &6%max%"),
-        asString(messagesMap.get("reload-failed"), "&7Der Reload ist &6fehlgeschlagen&7. Siehe Konsole."),
-        asString(messagesMap.get("no-permission"), "&7Dazu hast du &6keine Berechtigung&7."),
-        asString(messagesMap.get("usage"), "&7Verwendung: &6/playerlimit reload &7| &6/wartung")
-    );
-
-    Map<String, Object> motdMap = asMap(root.get("motd"));
-    List<String> lines = asStringList(motdMap.get("lines"));
-    if (lines.isEmpty()) {
-      lines = List.of(
-          "&6■■■■■■■■■■■■ &e✦ &6TOWNITY.DE &e✦ &6■■■■■■■■■■■■",
-          "&6       ⚙ &6ᴄɪᴛʏʙᴜɪʟᴅ &e• &6ᴇᴠᴇɴᴛꜱ &e• &6ᴄᴏᴍᴍᴜɴɪᴛʏ ⚙"
-      );
-    }
-
-    PluginConfig.Motd motd = new PluginConfig.Motd(
-        asBoolean(motdMap.get("enabled"), true),
-        asString(motdMap.get("format"), "auto").toLowerCase(),
-        asString(motdMap.get("file"), ""),
-        List.copyOf(lines)
-    );
-
-    Map<String, Object> maintenanceMap = asMap(root.get("maintenance"));
-    Map<String, Object> maintenanceMessagesMap = asMap(maintenanceMap.get("messages"));
-    Map<String, Object> maintenanceMotdMap = asMap(maintenanceMap.get("motd"));
-    List<String> maintenanceMotdLines = asStringList(maintenanceMotdMap.get("lines"));
-    if (maintenanceMotdLines.isEmpty()) {
-      maintenanceMotdLines = List.of(
-          "&6■■■■■■■■■■■■ &e✦ &6TOWNITY.DE &e✦ &6■■■■■■■■■■■■",
-          "&6          ⚙ &6ᴡᴀʀᴛᴜɴɢ &e• &6ʙᴀʟᴅ &e• &6ᴢᴜʀüᴄᴋ ⚙"
-      );
-    }
-
-    PluginConfig.MaintenanceMessages maintenanceMessages = new PluginConfig.MaintenanceMessages(
-        asString(maintenanceMessagesMap.get("network-kick"), "&7Das Netzwerk ist derzeit in &6Wartung&7."),
-        asString(maintenanceMessagesMap.get("server-kick"), "&7Der Server &6%server% &7ist in &6Wartung&7."),
-        asString(maintenanceMessagesMap.get("network-denied"), "&7Das Netzwerk ist derzeit in &6Wartung&7."),
-        asString(maintenanceMessagesMap.get("server-denied"), "&7Du kannst &6%server% &7gerade nicht betreten (&6Wartung&7)."),
-        asString(maintenanceMessagesMap.get("enabled"), "&7Netzwerk-Wartung wurde &6aktiviert&7."),
-        asString(maintenanceMessagesMap.get("disabled"), "&7Netzwerk-Wartung wurde &6deaktiviert&7."),
-        asString(maintenanceMessagesMap.get("server-enabled"), "&7Wartung für &6%server% &7wurde &6aktiviert&7."),
-        asString(maintenanceMessagesMap.get("server-disabled"), "&7Wartung für &6%server% &7wurde &6deaktiviert&7."),
-        asString(maintenanceMessagesMap.get("status"), "&7Netzwerk: &6%network% &7| Server: &6%servers%"),
-        asString(maintenanceMessagesMap.get("unknown-server"), "&7Unbekannter Server: &6%server%"),
-        asString(maintenanceMessagesMap.get("usage"), "&7Verwendung: &6/wartung &7| &6an&7/&6aus &7| &6server <name> <an|aus> &7| &6status")
-    );
-
-    PluginConfig.Maintenance maintenance = new PluginConfig.Maintenance(
-        asString(maintenanceMap.get("bypass-permission"), "townity.wartungssystem.bypass"),
-        asBoolean(maintenanceMap.get("kick-on-enable"), true),
-        asBoolean(maintenanceMap.get("block-join"), true),
-        asBoolean(maintenanceMotdMap.get("enabled"), true),
-        List.copyOf(maintenanceMotdLines),
-        asString(maintenanceMotdMap.get("format"), asString(motdMap.get("format"), "auto")).toLowerCase(),
-        maintenanceMessages
-    );
-
-    return new PluginConfig(
-        maxPlayers,
-        bypassCountsAsSlot,
-        bypassPermission,
-        updatePingMaxPlayers,
-        prefix,
-        disconnectPrefix,
-        messages,
-        motd,
-        maintenance
-    );
+    return new PluginConfig(Math.max(0, asInt(root.get("max-players"), 100)));
   }
 
-  private static PluginConfig defaults() {
-    return new PluginConfig(
-        100,
-        false,
-        "townity.playerlimit.bypass",
-        true,
-        MessageUtil.DEFAULT_PREFIX,
-        MessageUtil.DEFAULT_DISCONNECT_PREFIX,
-        new PluginConfig.Messages(
-            "&7Der Server ist aktuell &6voll&7! &7(&6%online%&7/&6%max%&7)",
-            "&7Die Config wurde &6erfolgreich &7neu geladen&7. &7Max: &6%max%",
-            "&7Der Reload ist &6fehlgeschlagen&7. Siehe Konsole.",
-            "&7Dazu hast du &6keine Berechtigung&7.",
-            "&7Verwendung: &6/playerlimit reload &7| &6/wartung"
-        ),
-        new PluginConfig.Motd(
-            true,
-            "auto",
-            "",
-            List.of(
-                "&6■■■■■■■■■■■■ &e✦ &6TOWNITY.DE &e✦ &6■■■■■■■■■■■■",
-                "&6       ⚙ &6ᴄɪᴛʏʙᴜɪʟᴅ &e• &6ᴇᴠᴇɴᴛꜱ &e• &6ᴄᴏᴍᴍᴜɴɪᴛʏ ⚙"
-            )
-        ),
-        new PluginConfig.Maintenance(
-            "townity.wartungssystem.bypass",
-            true,
-            true,
-            true,
-            List.of(
-                "&6■■■■■■■■■■■■ &e✦ &6TOWNITY.DE &e✦ &6■■■■■■■■■■■■",
-                "&6          ⚙ &6ᴡᴀʀᴛᴜɴɢ &e• &6ʙᴀʟᴅ &e• &6ᴢᴜʀüᴄᴋ ⚙"
-            ),
-            "auto",
-            new PluginConfig.MaintenanceMessages(
-                "&7Das Netzwerk ist derzeit in &6Wartung&7.",
-                "&7Der Server &6%server% &7ist in &6Wartung&7.",
-                "&7Das Netzwerk ist derzeit in &6Wartung&7.",
-                "&7Du kannst &6%server% &7gerade nicht betreten (&6Wartung&7).",
-                "&7Netzwerk-Wartung wurde &6aktiviert&7.",
-                "&7Netzwerk-Wartung wurde &6deaktiviert&7.",
-                "&7Wartung für &6%server% &7wurde &6aktiviert&7.",
-                "&7Wartung für &6%server% &7wurde &6deaktiviert&7.",
-                "&7Netzwerk: &6%network% &7| Server: &6%servers%",
-                "&7Unbekannter Server: &6%server%",
-                "&7Verwendung: &6/wartung &7| &6an&7/&6aus &7| &6server <name> <an|aus> &7| &6status"
-            )
-        )
-    );
-  }
-
-  @SuppressWarnings("unchecked")
-  private static Map<String, Object> asMap(Object value) {
-    if (value instanceof Map<?, ?> map) {
-      return (Map<String, Object>) map;
-    }
-    return Collections.emptyMap();
-  }
-
-  private static List<String> asStringList(Object value) {
-    if (!(value instanceof List<?> list)) {
+  private static java.util.List<String> asStringList(Object value) {
+    if (!(value instanceof java.util.List<?> list)) {
       return new ArrayList<>();
     }
-    List<String> result = new ArrayList<>();
+    java.util.List<String> result = new ArrayList<>();
     for (Object entry : list) {
       if (entry != null) {
         result.add(String.valueOf(entry));
       }
     }
     return result;
-  }
-
-  private static String asString(Object value, String fallback) {
-    return value == null ? fallback : String.valueOf(value);
   }
 
   private static int asInt(Object value, int fallback) {

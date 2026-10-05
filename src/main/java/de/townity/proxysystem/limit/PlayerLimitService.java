@@ -9,7 +9,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Counts occupied slots including in-flight logins so concurrent joins cannot bypass the cap.
+ * Counts occupied slots including in-flight logins so concurrent joins cannot exceed the cap.
+ * Every joining player consumes a slot – there is no bypass.
  */
 public final class PlayerLimitService {
 
@@ -21,10 +22,6 @@ public final class PlayerLimitService {
     this.plugin = plugin;
   }
 
-  public boolean takesSlot(Player player, PluginConfig config) {
-    return config.bypassCountsAsSlot() || !player.hasPermission(config.bypassPermission());
-  }
-
   /**
    * Reserves a slot for the player if one is free.
    *
@@ -32,15 +29,11 @@ public final class PlayerLimitService {
    */
   public boolean tryReserve(Player player, PluginConfig config) {
     UUID id = player.getUniqueId();
-    if (!takesSlot(player, config)) {
-      reservedSlots.remove(id);
-      return true;
-    }
     synchronized (lock) {
       if (reservedSlots.contains(id)) {
         return true;
       }
-      if (countOccupiedExcept(id, config) >= config.maxPlayers()) {
+      if (countOccupiedExcept(id) >= config.maxPlayers()) {
         return false;
       }
       reservedSlots.add(id);
@@ -56,7 +49,7 @@ public final class PlayerLimitService {
 
   public int occupiedSlots(PluginConfig config) {
     synchronized (lock) {
-      return countOccupiedExcept(null, config);
+      return countOccupiedExcept(null);
     }
   }
 
@@ -64,22 +57,15 @@ public final class PlayerLimitService {
     synchronized (lock) {
       reservedSlots.clear();
       for (Player online : plugin.server().getAllPlayers()) {
-        if (takesSlot(online, config)) {
-          reservedSlots.add(online.getUniqueId());
-        }
+        reservedSlots.add(online.getUniqueId());
       }
     }
   }
 
-  private int countOccupiedExcept(UUID exclude, PluginConfig config) {
+  private int countOccupiedExcept(UUID exclude) {
     Set<UUID> counted = new HashSet<>(reservedSlots);
     for (Player online : plugin.server().getAllPlayers()) {
-      UUID id = online.getUniqueId();
-      if (takesSlot(online, config)) {
-        counted.add(id);
-      } else {
-        counted.remove(id);
-      }
+      counted.add(online.getUniqueId());
     }
     if (exclude != null) {
       counted.remove(exclude);

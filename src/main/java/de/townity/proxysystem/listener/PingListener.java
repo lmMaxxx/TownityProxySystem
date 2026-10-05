@@ -5,6 +5,7 @@ import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import de.townity.proxysystem.TownityProxySystem;
 import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.config.TownityMessages;
 import de.townity.proxysystem.util.MessageUtil;
 import de.townity.proxysystem.util.MotdService;
 import net.kyori.adventure.text.Component;
@@ -23,7 +24,7 @@ public final class PingListener {
     ServerPing.Builder builder = event.getPing().asBuilder();
     boolean changed = false;
 
-    if (config.updatePingMaxPlayers()) {
+    if (TownityMessages.UPDATE_PING_MAX_PLAYERS) {
       builder.maximumPlayers(config.maxPlayers());
       changed = true;
     }
@@ -42,16 +43,16 @@ public final class PingListener {
   private Component resolveMotd(PluginConfig config) {
     if (plugin.maintenance() != null
         && plugin.maintenance().isNetworkEnabled()
-        && config.maintenance().overrideMotd()) {
+        && TownityMessages.MAINTENANCE_OVERRIDE_MOTD) {
       MessageUtil.Placeholders placeholders =
           new MessageUtil.Placeholders(plugin.onlinePlayers(), config.maxPlayers());
       return MessageUtil.joinLines(
-          config.maintenance().motdLines(),
-          config.maintenance().format(),
+          TownityMessages.MAINTENANCE_MOTD_LINES,
+          TownityMessages.FORMAT,
           placeholders
       );
     }
-    if (config.motd().enabled()) {
+    if (TownityMessages.MOTD_ENABLED) {
       return MotdService.buildMotd(plugin);
     }
     return null;

@@ -15,7 +15,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
  */
 public final class MessageUtil {
 
-  public static final String DEFAULT_PREFIX = "&6&lTOWNITY.DE &7⇒ ";
+  public static final String DEFAULT_PREFIX = "&6&lTOWNITY.DE &7⇒";
   public static final String DEFAULT_DISCONNECT_PREFIX = "&6&lTOWNITY.DE";
 
   private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
@@ -58,6 +58,9 @@ public final class MessageUtil {
   /** Parses a chat message and prepends the configured Townity prefix (with arrow). */
   public static Component parsePrefixed(String prefix, String body, String format) {
     String safePrefix = prefix == null || prefix.isBlank() ? DEFAULT_PREFIX : prefix;
+    if (!safePrefix.endsWith(" ")) {
+      safePrefix = safePrefix + " ";
+    }
     String safeBody = body == null ? "" : body;
     return parse(safePrefix + safeBody, format);
   }

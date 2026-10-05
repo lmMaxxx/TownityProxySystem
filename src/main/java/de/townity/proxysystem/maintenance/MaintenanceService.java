@@ -4,6 +4,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.townity.proxysystem.TownityProxySystem;
 import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.config.TownityMessages;
 import de.townity.proxysystem.util.MessageUtil;
 import java.util.Locale;
 import java.util.Optional;
@@ -27,12 +28,12 @@ public final class MaintenanceService {
   }
 
   public boolean canBypass(Player player) {
-    return player.hasPermission(plugin.config().maintenance().bypassPermission());
+    return player.hasPermission(TownityMessages.MAINTENANCE_BYPASS);
   }
 
   public void setNetworkEnabled(boolean enabled) {
     plugin.configManager().setNetworkMaintenance(enabled);
-    if (enabled && plugin.config().maintenance().kickOnEnable()) {
+    if (enabled && TownityMessages.MAINTENANCE_KICK_ON_ENABLE) {
       kickNetwork();
     }
   }
@@ -44,18 +45,18 @@ public final class MaintenanceService {
     }
     String name = registered.get().getServerInfo().getName();
     plugin.configManager().setServerMaintenance(name, enabled);
-    if (enabled && plugin.config().maintenance().kickOnEnable()) {
+    if (enabled && TownityMessages.MAINTENANCE_KICK_ON_ENABLE) {
       kickServer(registered.get());
     }
     return true;
   }
 
   public Component networkDeniedMessage() {
-    return disconnectMessage(plugin.config().maintenance().messages().networkDenied(), "");
+    return disconnectMessage(TownityMessages.MAINTENANCE_NETWORK_DENIED, "");
   }
 
   public Component serverDeniedMessage(String serverName) {
-    return disconnectMessage(plugin.config().maintenance().messages().serverDenied(), serverName);
+    return disconnectMessage(TownityMessages.MAINTENANCE_SERVER_DENIED, serverName);
   }
 
   public Component statusMessage() {
@@ -64,14 +65,10 @@ public final class MaintenanceService {
     String servers = state.servers().isEmpty()
         ? "-"
         : state.servers().stream().sorted(String.CASE_INSENSITIVE_ORDER).collect(Collectors.joining(", "));
-    String raw = plugin.config().maintenance().messages().status()
+    String raw = TownityMessages.MAINTENANCE_STATUS
         .replace("%network%", network)
         .replace("%servers%", servers);
-    return MessageUtil.parsePrefixed(
-        plugin.config().prefix(),
-        raw,
-        plugin.config().maintenance().format()
-    );
+    return MessageUtil.parsePrefixed(TownityMessages.PREFIX, raw, TownityMessages.FORMAT);
   }
 
   public Optional<RegisteredServer> findServer(String name) {
@@ -92,7 +89,7 @@ public final class MaintenanceService {
   }
 
   public void kickNetwork() {
-    Component reason = disconnectMessage(plugin.config().maintenance().messages().networkKick(), "");
+    Component reason = disconnectMessage(TownityMessages.MAINTENANCE_NETWORK_KICK, "");
     for (Player player : plugin.server().getAllPlayers()) {
       if (!canBypass(player)) {
         player.disconnect(reason);
@@ -102,7 +99,7 @@ public final class MaintenanceService {
 
   public void kickServer(RegisteredServer server) {
     String name = server.getServerInfo().getName();
-    Component reason = disconnectMessage(plugin.config().maintenance().messages().serverKick(), name);
+    Component reason = disconnectMessage(TownityMessages.MAINTENANCE_SERVER_KICK, name);
     for (Player player : server.getPlayersConnected()) {
       if (!canBypass(player)) {
         player.disconnect(reason);
@@ -113,7 +110,7 @@ public final class MaintenanceService {
   /** Called after proxy start / reload if persisted network maintenance is on. */
   public void enforcePersistedState() {
     PluginConfig.MaintenanceState state = plugin.configManager().maintenanceState();
-    if (!plugin.config().maintenance().kickOnEnable()) {
+    if (!TownityMessages.MAINTENANCE_KICK_ON_ENABLE) {
       return;
     }
     if (state.networkEnabled()) {
@@ -128,9 +125,9 @@ public final class MaintenanceService {
     MessageUtil.Placeholders placeholders =
         new MessageUtil.Placeholders(plugin.onlinePlayers(), plugin.config().maxPlayers(), server);
     return MessageUtil.parseDisconnect(
-        plugin.config().disconnectPrefix(),
+        TownityMessages.DISCONNECT_PREFIX,
         placeholders.apply(template),
-        plugin.config().maintenance().format()
+        TownityMessages.FORMAT
     );
   }
 }

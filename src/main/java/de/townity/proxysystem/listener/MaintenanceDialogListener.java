@@ -10,10 +10,10 @@ import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCustomClickAction;
 import com.velocitypowered.api.proxy.Player;
 import de.townity.proxysystem.TownityProxySystem;
-import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.config.TownityMessages;
 import de.townity.proxysystem.maintenance.MaintenanceDialogService;
 import de.townity.proxysystem.maintenance.MaintenanceService;
-import de.townity.proxysystem.util.MessageUtil;
+import de.townity.proxysystem.util.Messages;
 import java.util.UUID;
 
 public final class MaintenanceDialogListener extends PacketListenerAbstract {
@@ -60,11 +60,10 @@ public final class MaintenanceDialogListener extends PacketListenerAbstract {
 
   private void handle(Player player, ResourceLocation id, NBT payload) {
     if (!player.hasPermission(ADMIN_PERMISSION)) {
-      player.sendMessage(parse(plugin.config().messages().noPermission()));
+      Messages.sendError(player, TownityMessages.NO_PERMISSION);
       return;
     }
 
-    PluginConfig.MaintenanceMessages messages = plugin.config().maintenance().messages();
     String key = id.getKey();
 
     if (key.endsWith("open_servers")) {
@@ -79,7 +78,7 @@ public final class MaintenanceDialogListener extends PacketListenerAbstract {
 
     if (key.endsWith("network_on")) {
       maintenance.setNetworkEnabled(true);
-      player.sendMessage(parse(messages.enabled()));
+      Messages.sendSuccess(player, TownityMessages.MAINTENANCE_ENABLED);
       plugin.logger().info("Network maintenance enabled by {}", player.getUsername());
       dialogs.open(player);
       return;
@@ -87,7 +86,7 @@ public final class MaintenanceDialogListener extends PacketListenerAbstract {
 
     if (key.endsWith("network_off")) {
       maintenance.setNetworkEnabled(false);
-      player.sendMessage(parse(messages.disabled()));
+      Messages.sendSuccess(player, TownityMessages.MAINTENANCE_DISABLED);
       plugin.logger().info("Network maintenance disabled by {}", player.getUsername());
       dialogs.open(player);
       return;
@@ -100,12 +99,14 @@ public final class MaintenanceDialogListener extends PacketListenerAbstract {
 
     boolean enable = key.endsWith("server_on");
     if (!maintenance.setServerEnabled(serverName, enable)) {
-      player.sendMessage(parse(messages.unknownServer().replace("%server%", serverName)));
+      Messages.sendError(player, TownityMessages.MAINTENANCE_UNKNOWN_SERVER.replace("%server%", serverName));
       return;
     }
 
-    String template = enable ? messages.serverEnabled() : messages.serverDisabled();
-    player.sendMessage(parse(template.replace("%server%", serverName)));
+    String template = enable
+        ? TownityMessages.MAINTENANCE_SERVER_ENABLED
+        : TownityMessages.MAINTENANCE_SERVER_DISABLED;
+    Messages.sendSuccess(player, template.replace("%server%", serverName));
     plugin.logger().info(
         "Server maintenance {} for {} by {}",
         enable ? "enabled" : "disabled",
@@ -120,13 +121,5 @@ public final class MaintenanceDialogListener extends PacketListenerAbstract {
       return compound.getStringTagValueOrNull("server");
     }
     return null;
-  }
-
-  private net.kyori.adventure.text.Component parse(String message) {
-    return MessageUtil.parsePrefixed(
-        plugin.config().prefix(),
-        message,
-        plugin.config().maintenance().format()
-    );
   }
 }

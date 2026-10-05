@@ -11,17 +11,25 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.townity.proxysystem.command.LobbyCommand;
 import de.townity.proxysystem.command.MaintenanceCommand;
-import de.townity.proxysystem.command.PlayerLimitCommand;
+import de.townity.proxysystem.command.ProxySystemCommand;
+import de.townity.proxysystem.command.RulesCommand;
 import de.townity.proxysystem.config.ConfigManager;
 import de.townity.proxysystem.config.PluginConfig;
+import de.townity.proxysystem.config.TownityMessages;
 import de.townity.proxysystem.limit.PlayerLimitService;
 import de.townity.proxysystem.listener.LoginListener;
 import de.townity.proxysystem.listener.MaintenanceDialogListener;
 import de.townity.proxysystem.listener.MaintenanceListener;
 import de.townity.proxysystem.listener.PingListener;
+import de.townity.proxysystem.listener.RulesDialogListener;
+import de.townity.proxysystem.listener.RulesJoinListener;
 import de.townity.proxysystem.maintenance.MaintenanceDialogService;
 import de.townity.proxysystem.maintenance.MaintenanceService;
+import de.townity.proxysystem.rules.RulesAcceptanceStore;
+import de.townity.proxysystem.rules.RulesDialogService;
+import de.townity.proxysystem.rules.RulesService;
 import io.github.retrooper.packetevents.velocity.factory.VelocityPacketEventsBuilder;
 import java.nio.file.Path;
 import org.slf4j.Logger;
@@ -30,7 +38,7 @@ import org.slf4j.Logger;
     id = "townityproxysystem",
     name = "TownityProxySystem",
     version = "1.2.0",
-    description = "Proxy system: player cap, MOTD and persistent network/server maintenance.",
+    description = "Proxy system: player cap, MOTD, rules acceptance and persistent network/server maintenance.",
     authors = {"Townity"}
 )
 public final class TownityProxySystem {
@@ -42,6 +50,8 @@ public final class TownityProxySystem {
   private final ConfigManager configManager;
   private MaintenanceService maintenanceService;
   private MaintenanceDialogService dialogService;
+  private RulesService rulesService;
+  private RulesDialogService rulesDialogService;
   private PlayerLimitService playerLimitService;
 
   @Inject
@@ -66,24 +76,34 @@ public final class TownityProxySystem {
     maintenanceService = new MaintenanceService(this);
     dialogService = new MaintenanceDialogService(this, maintenanceService);
 
+    RulesAcceptanceStore rulesStore = new RulesAcceptanceStore(dataDirectory, logger);
+    rulesStore.load();
+    rulesService = new RulesService(this, rulesStore);
+    rulesDialogService = new RulesDialogService(this, rulesService);
+    RulesJoinListener rulesJoinListener = new RulesJoinListener(this, rulesService, rulesDialogService);
+
     PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, pluginContainer, logger, dataDirectory));
     PacketEvents.getAPI().getSettings().checkForUpdates(false);
     PacketEvents.getAPI().load();
     PacketEvents.getAPI().getEventManager().registerListener(
         new MaintenanceDialogListener(this, maintenanceService, dialogService)
     );
+    PacketEvents.getAPI().getEventManager().registerListener(
+        new RulesDialogListener(this, rulesService, rulesDialogService, rulesJoinListener)
+    );
     PacketEvents.getAPI().init();
 
     server.getEventManager().register(this, new MaintenanceListener(this, maintenanceService));
     server.getEventManager().register(this, new LoginListener(this, playerLimitService));
     server.getEventManager().register(this, new PingListener(this));
+    server.getEventManager().register(this, rulesJoinListener);
 
     CommandManager commandManager = server.getCommandManager();
-    CommandMeta limitMeta = commandManager.metaBuilder("playerlimit")
-        .aliases("plimit", "playercap")
+    CommandMeta proxyMeta = commandManager.metaBuilder("proxysystem")
+        .aliases("tpsys", "tpsystem", "slots")
         .plugin(this)
         .build();
-    commandManager.register(limitMeta, new PlayerLimitCommand(this));
+    commandManager.register(proxyMeta, new ProxySystemCommand(this));
 
     CommandMeta maintenanceMeta = commandManager.metaBuilder("wartung")
         .aliases("maintenance", "maintenancemode")
@@ -91,11 +111,24 @@ public final class TownityProxySystem {
         .build();
     commandManager.register(maintenanceMeta, new MaintenanceCommand(this, maintenanceService, dialogService));
 
+    CommandMeta lobbyMeta = commandManager.metaBuilder("lobby")
+        .aliases("hub", "l", "leave")
+        .plugin(this)
+        .build();
+    commandManager.register(lobbyMeta, new LobbyCommand(this));
+
+    CommandMeta rulesMeta = commandManager.metaBuilder("regeln")
+        .aliases("rules", "regelwerk")
+        .plugin(this)
+        .build();
+    commandManager.register(rulesMeta, new RulesCommand(this, rulesService, rulesDialogService));
+
     PluginConfig config = configManager.config();
     PluginConfig.MaintenanceState state = configManager.maintenanceState();
     logger.info(
-        "TownityProxySystem enabled – max players: {}, network maintenance: {}, servers: {}",
+        "TownityProxySystem enabled – max players: {}, rules v{}, network maintenance: {}, servers: {}",
         config.maxPlayers(),
+        TownityMessages.RULES_VERSION,
         state.networkEnabled(),
         state.servers().isEmpty() ? "-" : state.servers()
     );
@@ -130,6 +163,14 @@ public final class TownityProxySystem {
     return dialogService;
   }
 
+  public RulesService rules() {
+    return rulesService;
+  }
+
+  public RulesDialogService rulesDialogs() {
+    return rulesDialogService;
+  }
+
   public PluginConfig config() {
     return configManager.config();
   }
@@ -139,6 +180,14 @@ public final class TownityProxySystem {
     if (ok && maintenanceService != null) {
       maintenanceService.enforcePersistedState();
     }
+    if (ok && playerLimitService != null) {
+      playerLimitService.syncOnline(configManager.config());
+    }
+    return ok;
+  }
+
+  public boolean setMaxPlayers(int maxPlayers) {
+    boolean ok = configManager.setMaxPlayers(maxPlayers);
     if (ok && playerLimitService != null) {
       playerLimitService.syncOnline(configManager.config());
     }

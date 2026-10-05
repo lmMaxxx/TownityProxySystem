@@ -1,7 +1,6 @@
 package de.townity.proxysystem.maintenance;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.dialog.CommonDialogData;
 import com.github.retrooper.packetevents.protocol.dialog.Dialog;
 import com.github.retrooper.packetevents.protocol.dialog.DialogAction;
@@ -22,6 +21,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSh
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.townity.proxysystem.TownityProxySystem;
+import de.townity.proxysystem.config.TownityMessages;
 import de.townity.proxysystem.util.MessageUtil;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -55,19 +55,7 @@ public final class MaintenanceDialogService {
     this.maintenance = maintenance;
   }
 
-  public boolean supportsDialogs() {
-    try {
-      ServerVersion version = PacketEvents.getAPI().getServerManager().getVersion();
-      return version.isNewerThanOrEquals(ServerVersion.V_1_21_6);
-    } catch (Exception e) {
-      return false;
-    }
-  }
-
   public boolean canUseDialog(Player player) {
-    if (!supportsDialogs()) {
-      return false;
-    }
     User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
     return user != null && !user.getClientVersion().isOlderThan(MIN_DIALOG_VERSION);
   }
@@ -168,10 +156,11 @@ public final class MaintenanceDialogService {
   }
 
   private Dialog multiAction(Component body, List<ActionButton> actions, ActionButton exit) {
-    Component title = MessageUtil.parse(plugin.config().disconnectPrefix());
+    Component title = MessageUtil.parse(TownityMessages.MAINTENANCE_DIALOG_TITLE);
+    Component external = MessageUtil.parse(TownityMessages.DISCONNECT_PREFIX);
     CommonDialogData data = new CommonDialogData(
         title,
-        title,
+        external,
         true,
         false,
         DialogAction.CLOSE,
@@ -220,7 +209,7 @@ public final class MaintenanceDialogService {
   }
 
   private Component prefixed(String body) {
-    return MessageUtil.parsePrefixed(plugin.config().prefix(), body, plugin.config().maintenance().format());
+    return MessageUtil.parsePrefixed(TownityMessages.PREFIX, body, TownityMessages.FORMAT);
   }
 
   private Component commandLine(String label, String command, String tooltip) {
