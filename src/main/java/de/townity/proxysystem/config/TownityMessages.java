@@ -38,9 +38,17 @@ public final class TownityMessages {
   public static final String LOBBY_FAILED = "Verbindung zu %server% fehlgeschlagen.";
   public static final String LOBBY_PLAYERS_ONLY = "Nur Spieler können zur Lobby.";
 
+  public static final String BAUSERVER_SERVER = "Bauserver";
+  public static final String BAUSERVER_PERMISSION = "townity.proxysystem.builder";
+  public static final String BAUSERVER_SUCCESS = "&7Du wirst zu &6%server% &7verbunden.";
+  public static final String BAUSERVER_ALREADY = "&7Du bist bereits auf &6%server%&7.";
+  public static final String BAUSERVER_UNKNOWN = "Bauserver %server% wurde nicht gefunden.";
+  public static final String BAUSERVER_FAILED = "Verbindung zu %server% fehlgeschlagen.";
+  public static final String BAUSERVER_PLAYERS_ONLY = "Nur Spieler können zum Bauserver.";
+
   public static final boolean MOTD_ENABLED = true;
   public static final List<String> MOTD_LINES = List.of(
-      "&6■■■■■■■■■■■■ &e✦ &6&lTOWNITY.DE&r &e✦ &6■■■■■■■■■■■■",
+      "&6■■■■■■■■■■■■ &e✦ &6TOWNITY.DE &e✦ &6■■■■■■■■■■■■",
       "&6       ⚙ &6ᴄɪᴛʏʙᴜɪʟᴅ &e• &6ᴇᴠᴇɴᴛꜱ &e• &6ᴄᴏᴍᴍᴜɴɪᴛʏ ⚙"
   );
 
@@ -78,7 +86,7 @@ public final class TownityMessages {
   public static final boolean MAINTENANCE_OVERRIDE_MOTD = true;
   public static final String MAINTENANCE_DIALOG_TITLE = "&8» &6&lWartung";
   public static final List<String> MAINTENANCE_MOTD_LINES = List.of(
-      "&6■■■■■■■■■■■■ &e✦ &6&lTOWNITY.DE&r &e✦ &6■■■■■■■■■■■■",
+      "&6■■■■■■■■■■■■ &e✦ &6TOWNITY.DE &e✦ &6■■■■■■■■■■■■",
       "&6          ⚙ &6ᴡᴀʀᴛᴜɴɢ &e• &6ʙᴀʟᴅ &e• &6ᴢᴜʀüᴄᴋ ⚙"
   );
   public static final String MAINTENANCE_NETWORK_KICK =

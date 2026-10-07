@@ -11,6 +11,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.townity.proxysystem.command.BauServerCommand;
 import de.townity.proxysystem.command.LobbyCommand;
 import de.townity.proxysystem.command.MaintenanceCommand;
 import de.townity.proxysystem.command.ProxySystemCommand;
@@ -116,6 +117,12 @@ public final class TownityProxySystem {
         .plugin(this)
         .build();
     commandManager.register(lobbyMeta, new LobbyCommand(this));
+
+    CommandMeta bauserverMeta = commandManager.metaBuilder("bauserver")
+        .aliases("bs")
+        .plugin(this)
+        .build();
+    commandManager.register(bauserverMeta, new BauServerCommand(this));
 
     CommandMeta rulesMeta = commandManager.metaBuilder("regeln")
         .aliases("rules", "regelwerk")
