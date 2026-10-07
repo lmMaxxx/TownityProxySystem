@@ -48,7 +48,7 @@ public final class TownityMessages {
 
   public static final boolean MOTD_ENABLED = true;
   public static final List<String> MOTD_LINES = List.of(
-      "&6■■■■■■■■■■■■ &e✦ &6TOWNITY.DE &e✦ &6■■■■■■■■■■■■",
+      "&6■■■■■■■■■■■■ &e✦ &6&lTOWNITY.DE&r &e✦ &6■■■■■■■■■■■■",
       "&6       ⚙ &6ᴄɪᴛʏʙᴜɪʟᴅ &e• &6ᴇᴠᴇɴᴛꜱ &e• &6ᴄᴏᴍᴍᴜɴɪᴛʏ ⚙"
   );
 
@@ -86,7 +86,7 @@ public final class TownityMessages {
   public static final boolean MAINTENANCE_OVERRIDE_MOTD = true;
   public static final String MAINTENANCE_DIALOG_TITLE = "&8» &6&lWartung";
   public static final List<String> MAINTENANCE_MOTD_LINES = List.of(
-      "&6■■■■■■■■■■■■ &e✦ &6TOWNITY.DE &e✦ &6■■■■■■■■■■■■",
+      "&6■■■■■■■■■■■■ &e✦ &6&lTOWNITY.DE&r &e✦ &6■■■■■■■■■■■■",
       "&6          ⚙ &6ᴡᴀʀᴛᴜɴɢ &e• &6ʙᴀʟᴅ &e• &6ᴢᴜʀüᴄᴋ ⚙"
   );
   public static final String MAINTENANCE_NETWORK_KICK =
