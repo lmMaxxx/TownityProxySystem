@@ -89,7 +89,9 @@ public final class RulesDialogListener extends PacketListenerAbstract {
       return;
     }
     if (key.endsWith("decline")) {
-      joinListener.completeDecline(player);
+      // Nicht die Config-Continuation fortsetzen – sonst Dirt-Loading-Loop.
+      // Disconnect räumt pending in RulesJoinListener.onDisconnect auf.
+      plugin.logger().info("Rules declined by {}", player.getUsername());
       rules.decline(player);
     }
   }

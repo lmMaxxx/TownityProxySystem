@@ -165,7 +165,7 @@ public final class RulesDialogService {
   }
 
   private Dialog buildDialog() {
-    Component body = parseBody();
+    Component body = parseBodyPlain();
     Component title = MessageUtil.parse(TownityMessages.RULES_TITLE);
     Component external = MessageUtil.parse(TownityMessages.DISCONNECT_PREFIX);
 
@@ -179,12 +179,15 @@ public final class RulesDialogService {
         )
     );
 
+    // WAIT_FOR_RESPONSE: Dialog bleibt bis Server antwortet – kein Rückfall in den Dirt-Loading-Screen.
+    // canCloseWithEscape=false: Esc darf den Dialog nicht schließen (sonst Loading-Loop).
+    // pause=false: nötig für after_action none/wait_for_response.
     CommonDialogData data = new CommonDialogData(
         title,
         external,
         false,
-        true,
-        DialogAction.CLOSE,
+        false,
+        DialogAction.WAIT_FOR_RESPONSE,
         List.of(new PlainMessageDialogBody(new PlainMessage(body, BODY_WIDTH))),
         List.of(checkbox)
     );
@@ -203,27 +206,17 @@ public final class RulesDialogService {
     return new MultiActionDialog(data, List.of(accept), decline, 1);
   }
 
-  private Component parseBody() {
-    String url = TownityMessages.RULES_URL;
+  /** Dialog-Body ohne ClickEvents – sonst öffnet der Client „Link öffnen“ und der Dialog verschwindet. */
+  private Component parseBodyPlain() {
     String[] lines = TownityMessages.RULES_BODY.replace("\r\n", "\n").replace('\r', '\n').split("\n", -1);
     Component result = Component.empty();
     for (int i = 0; i < lines.length; i++) {
       if (i > 0) {
         result = result.append(Component.newline());
       }
-      result = result.append(lineWithOptionalUrl(lines[i], url));
+      result = result.append(MessageUtil.parse(lines[i]));
     }
     return result;
-  }
-
-  private static Component lineWithOptionalUrl(String line, String url) {
-    Component parsed = MessageUtil.parse(line);
-    if (url.isEmpty() || !line.contains(url)) {
-      return parsed;
-    }
-    return parsed
-        .clickEvent(ClickEvent.openUrl(url))
-        .hoverEvent(HoverEvent.showText(MessageUtil.parse("&7Öffnen: &6" + url)));
   }
 
   public void sendChatFallback(Player player) {

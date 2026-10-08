@@ -68,6 +68,26 @@ public final class RulesAcceptanceStore {
     save();
   }
 
+  /** Clears acceptance so the player must accept again. Returns {@code true} if an entry existed. */
+  public synchronized boolean reset(UUID uuid) {
+    boolean removed = accepted.remove(uuid) != null;
+    if (removed) {
+      save();
+    }
+    return removed;
+  }
+
+  /** Clears all acceptances. Returns how many entries were removed. */
+  public synchronized int resetAll() {
+    int count = accepted.size();
+    if (count == 0) {
+      return 0;
+    }
+    accepted.clear();
+    save();
+    return count;
+  }
+
   private void save() {
     try {
       Files.createDirectories(path.getParent());

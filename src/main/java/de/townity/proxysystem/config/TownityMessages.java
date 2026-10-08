@@ -77,8 +77,20 @@ public final class TownityMessages {
   public static final String RULES_ALREADY =
       "&7Du hast das &6Regelwerk &7bereits akzeptiert.";
   public static final String RULES_USAGE =
-      "&7Verwendung: &6/regeln &7| &6akzeptieren&7 | &6ablehnen";
+      "&7Verwendung: &6/regeln &7| &6akzeptieren&7 | &6ablehnen&7 | &6reset <spieler|all>";
   public static final String RULES_PLAYERS_ONLY = "Nur Spieler können das Regelwerk akzeptieren.";
+  public static final String RULES_RESET_PERMISSION = "townity.proxysystem.rules.reset";
+  public static final String RULES_RESET_USAGE =
+      "&7Verwendung: &6/regeln reset <spieler|all>";
+  public static final String RULES_RESET_PLAYER =
+      "&7Regelwerk-Akzeptanz von &6%player% &7wurde &6zurückgesetzt&7.";
+  public static final String RULES_RESET_PLAYER_NONE =
+      "&7&6%player% &7hatte keine gespeicherte Regelwerk-Akzeptanz.";
+  public static final String RULES_RESET_ALL =
+      "&7Regelwerk-Akzeptanz für &6%count% &7Spieler wurde &6zurückgesetzt&7.";
+  public static final String RULES_RESET_UNKNOWN_PLAYER = "Spieler nicht gefunden: %player%";
+  public static final String RULES_RESET_NOTIFY =
+      "&7Dein Regelwerk muss erneut &6akzeptiert&7 werden.";
 
   public static final String MAINTENANCE_BYPASS = "townity.wartungssystem.bypass";
   public static final boolean MAINTENANCE_KICK_ON_ENABLE = true;

@@ -4,6 +4,7 @@ import com.velocitypowered.api.proxy.Player;
 import de.townity.proxysystem.TownityProxySystem;
 import de.townity.proxysystem.config.TownityMessages;
 import de.townity.proxysystem.util.MessageUtil;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 
 public final class RulesService {
@@ -36,6 +37,16 @@ public final class RulesService {
 
   public void decline(Player player) {
     player.disconnect(declineDisconnectMessage());
+  }
+
+  /** @return {@code true} if the player had an acceptance entry */
+  public boolean reset(UUID uuid) {
+    return store.reset(uuid);
+  }
+
+  /** @return number of cleared acceptances */
+  public int resetAll() {
+    return store.resetAll();
   }
 
   public Component declineDisconnectMessage() {

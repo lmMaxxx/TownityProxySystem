@@ -86,18 +86,6 @@ public final class RulesJoinListener {
     return false;
   }
 
-  public boolean completeDecline(Player player) {
-    Continuation continuation = pending.remove(player.getUniqueId());
-    if (continuation != null) {
-      try {
-        continuation.resume();
-      } catch (Exception ignored) {
-        // ignore
-      }
-    }
-    return true;
-  }
-
   public boolean isPending(UUID uuid) {
     return pending.containsKey(uuid);
   }
