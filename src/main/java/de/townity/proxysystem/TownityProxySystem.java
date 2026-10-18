@@ -7,6 +7,7 @@ import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
@@ -15,6 +16,7 @@ import de.townity.proxysystem.command.BauServerCommand;
 import de.townity.proxysystem.command.LobbyCommand;
 import de.townity.proxysystem.command.MaintenanceCommand;
 import de.townity.proxysystem.command.ProxySystemCommand;
+import de.townity.proxysystem.command.RangShopCommand;
 import de.townity.proxysystem.command.RulesCommand;
 import de.townity.proxysystem.config.ConfigManager;
 import de.townity.proxysystem.config.PluginConfig;
@@ -24,10 +26,16 @@ import de.townity.proxysystem.listener.LoginListener;
 import de.townity.proxysystem.listener.MaintenanceDialogListener;
 import de.townity.proxysystem.listener.MaintenanceListener;
 import de.townity.proxysystem.listener.PingListener;
+import de.townity.proxysystem.listener.PlaytimeListener;
+import de.townity.proxysystem.listener.RangShopDialogListener;
 import de.townity.proxysystem.listener.RulesDialogListener;
 import de.townity.proxysystem.listener.RulesJoinListener;
 import de.townity.proxysystem.maintenance.MaintenanceDialogService;
 import de.townity.proxysystem.maintenance.MaintenanceService;
+import de.townity.proxysystem.rangshop.LuckPermsBridge;
+import de.townity.proxysystem.rangshop.PlaytimePointsStore;
+import de.townity.proxysystem.rangshop.RangShopDialogService;
+import de.townity.proxysystem.rangshop.RangShopService;
 import de.townity.proxysystem.rules.RulesAcceptanceStore;
 import de.townity.proxysystem.rules.RulesDialogService;
 import de.townity.proxysystem.rules.RulesService;
@@ -38,9 +46,12 @@ import org.slf4j.Logger;
 @Plugin(
     id = "townityproxysystem",
     name = "TownityProxySystem",
-    version = "1.2.0",
-    description = "Proxy system: player cap, MOTD, rules acceptance and persistent network/server maintenance.",
-    authors = {"Townity"}
+    version = "1.3.0",
+    description = "Proxy system: player cap, MOTD, rules, maintenance and playtime rangshop.",
+    authors = {"Townity"},
+    dependencies = {
+        @Dependency(id = "luckperms", optional = true)
+    }
 )
 public final class TownityProxySystem {
 
@@ -54,6 +65,8 @@ public final class TownityProxySystem {
   private RulesService rulesService;
   private RulesDialogService rulesDialogService;
   private PlayerLimitService playerLimitService;
+  private RangShopService rangShopService;
+  private RangShopDialogService rangShopDialogService;
 
   @Inject
   public TownityProxySystem(
@@ -83,6 +96,13 @@ public final class TownityProxySystem {
     rulesDialogService = new RulesDialogService(this, rulesService);
     RulesJoinListener rulesJoinListener = new RulesJoinListener(this, rulesService, rulesDialogService);
 
+    PlaytimePointsStore pointsStore = new PlaytimePointsStore(dataDirectory, logger);
+    pointsStore.load();
+    LuckPermsBridge luckPermsBridge = new LuckPermsBridge(logger);
+    rangShopService = new RangShopService(this, pointsStore, luckPermsBridge);
+    rangShopDialogService = new RangShopDialogService(this, rangShopService);
+    rangShopService.start();
+
     PacketEvents.setAPI(VelocityPacketEventsBuilder.build(server, pluginContainer, logger, dataDirectory));
     PacketEvents.getAPI().getSettings().checkForUpdates(false);
     PacketEvents.getAPI().load();
@@ -92,12 +112,16 @@ public final class TownityProxySystem {
     PacketEvents.getAPI().getEventManager().registerListener(
         new RulesDialogListener(this, rulesService, rulesDialogService, rulesJoinListener)
     );
+    PacketEvents.getAPI().getEventManager().registerListener(
+        new RangShopDialogListener(this, rangShopService, rangShopDialogService)
+    );
     PacketEvents.getAPI().init();
 
     server.getEventManager().register(this, new MaintenanceListener(this, maintenanceService));
     server.getEventManager().register(this, new LoginListener(this, playerLimitService));
     server.getEventManager().register(this, new PingListener(this));
     server.getEventManager().register(this, rulesJoinListener);
+    server.getEventManager().register(this, new PlaytimeListener(rangShopService));
 
     CommandManager commandManager = server.getCommandManager();
     CommandMeta proxyMeta = commandManager.metaBuilder("proxysystem")
@@ -130,19 +154,29 @@ public final class TownityProxySystem {
         .build();
     commandManager.register(rulesMeta, new RulesCommand(this, rulesService, rulesDialogService));
 
+    CommandMeta rangShopMeta = commandManager.metaBuilder("vrangshop")
+        .aliases("rangshop")
+        .plugin(this)
+        .build();
+    commandManager.register(rangShopMeta, new RangShopCommand(rangShopDialogService));
+
     PluginConfig config = configManager.config();
     PluginConfig.MaintenanceState state = configManager.maintenanceState();
     logger.info(
-        "TownityProxySystem enabled – max players: {}, rules v{}, network maintenance: {}, servers: {}",
+        "TownityProxySystem enabled – max players: {}, rules v{}, network maintenance: {}, servers: {}, luckperms: {}",
         config.maxPlayers(),
         TownityMessages.RULES_VERSION,
         state.networkEnabled(),
-        state.servers().isEmpty() ? "-" : state.servers()
+        state.servers().isEmpty() ? "-" : state.servers(),
+        luckPermsBridge.isAvailable()
     );
   }
 
   @Subscribe
   public void onProxyShutdown(ProxyShutdownEvent event) {
+    if (rangShopService != null) {
+      rangShopService.shutdown();
+    }
     PacketEvents.getAPI().terminate();
   }
 
@@ -176,6 +210,14 @@ public final class TownityProxySystem {
 
   public RulesDialogService rulesDialogs() {
     return rulesDialogService;
+  }
+
+  public RangShopService rangShop() {
+    return rangShopService;
+  }
+
+  public RangShopDialogService rangShopDialogs() {
+    return rangShopDialogService;
   }
 
   public PluginConfig config() {

@@ -27,4 +27,9 @@ public final class TownitySounds {
   public static void menu(Player player) {
     player.playSound(MENU);
   }
+
+  /** Dialog erstmals öffnen (Command) – nicht bei Dialog-Navigation. */
+  public static void dialogOpen(Player player) {
+    player.playSound(MENU);
+  }
 }

@@ -73,6 +73,9 @@ Native Minecraft-Dialoge (1.21.6+, PacketEvents vom Proxy).
 
 Regelwerk erscheint in der **Configuration-Phase** (Login). Ablehnen = Disconnect.
 
+Rangshop (`/vrangshop`): Titel `&8» &6&lRangshop`, External `&6&lTOWNITY.DE`.  
+Spielzeitpunkte aus Netzwerk-Onlinezeit; Freischaltung Ritter → Baron → Graf (LuckPerms auf Velocity).
+
 ---
 
 ## Permissions
@@ -82,7 +85,7 @@ townity.<plugin>.<aktion>
 ```
 
 Beispiele: `townity.proxysystem.set`, `townity.wartungssystem`, `townity.wartungssystem.bypass`  
-Kein Regelwerk-Bypass.
+Kein Regelwerk-Bypass. Rangshop ohne Extra-Permission (jeder Spieler).
 
 ---
 

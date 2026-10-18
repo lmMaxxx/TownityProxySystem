@@ -122,4 +122,29 @@ public final class TownityMessages {
   public static final String MAINTENANCE_UNKNOWN_SERVER = "Unbekannter Server: %server%";
   public static final String MAINTENANCE_USAGE =
       "&7Verwendung: &6/wartung &7| &6an&7/&6aus &7| &6server <name> <an|aus> &7| &6status";
+
+  public static final String RANGSHOP_DIALOG_TITLE = "&8» &6&lRangshop";
+  public static final String RANGSHOP_PLAYERS_ONLY = "Nur Spieler können den Rangshop öffnen.";
+  public static final String RANGSHOP_NEED_UPDATE =
+      "Bitte Minecraft 1.21.6+ nutzen, um den Rangshop zu öffnen.";
+  public static final String RANGSHOP_LUCKPERMS_MISSING =
+      "LuckPerms ist auf dem Proxy nicht verfügbar.";
+  public static final String RANGSHOP_ABOVE_BODY =
+      "&7Der Rangshop ist für dich &6deaktiviert&7.\n"
+          + "&7Du hast bereits einen &6höheren Rang&7.\n"
+          + "&7Es werden keine Spielzeitpunkte mehr gesammelt.";
+  public static final String RANGSHOP_COMPLETE_BODY =
+      "&7Der Rangshop ist für dich &6deaktiviert&7.\n"
+          + "&7Du hast alle Ränge freigeschaltet (&6Graf&7).\n"
+          + "&7Es werden keine Spielzeitpunkte mehr gesammelt.";
+  public static final String RANGSHOP_ABOVE_SHORT = "&7Du hast bereits einen &6höheren Rang&7.";
+  public static final String RANGSHOP_ABOVE_ERROR = "Du hast bereits einen höheren Rang!";
+  public static final String RANGSHOP_DISABLED_ERROR = "Der Rangshop ist für dich deaktiviert!";
+  public static final String RANGSHOP_ALREADY = "Dieser Rang ist bereits freigeschaltet!";
+  public static final String RANGSHOP_NEED_PREVIOUS = "Zuerst %rank% freischalten!";
+  public static final String RANGSHOP_NOT_ENOUGH =
+      "Nicht genug Punkte! Benötigt: %need% (dein Stand: %points%)";
+  public static final String RANGSHOP_FAILED = "Rang konnte nicht gesetzt werden. Siehe Konsole.";
+  public static final String RANGSHOP_BOUGHT =
+      "&7Rang &6%rank% &7wurde &6freigeschaltet&7.";
 }
